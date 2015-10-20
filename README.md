@@ -1,4 +1,4 @@
-* draug - Data augmentation
+# draug - Data augmentation
 
 draug is a tool for generating many different views of one single
 image. It is intended for simulating the views of a planar target a
