@@ -1,6 +1,10 @@
 // Include standard libraries
 #include <iostream>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <boost/filesystem.hpp>
+
 // Include OpenCV libraries
 
 #include "opencv2/core.hpp"
@@ -23,8 +27,8 @@ cv::Mat original_img, transformed_img, tracking_img;
 std::string transformed_img_win = "Transformed Image";
 std::string trackbars_win = "Trackbars";
 
-const int alpha_slider_max = 100;
 const int scale_slider_max = 1000;
+const int brightness_slider_max = 1000;
 int angle, brightness, scale;
 int alpha_g, beta_g, gamma_g;
 int dx_g, dy_g, dz_g;
@@ -36,6 +40,8 @@ double dx_d, dy_d, dz_d;
 double f_d;
 
 
+// Function rotateImage from:
+// http://jepsonsblog.blogspot.nl/2012/11/rotation-in-3d-using-opencvs.html
 void rotateImage(const Mat &input, Mat &output, double alpha, double beta, double gamma, double dx, double dy, double dz, double f)
   {
     alpha = (alpha - 90) * CV_PI/180.;
@@ -92,45 +98,11 @@ void rotateImage(const Mat &input, Mat &output, double alpha, double beta, doubl
   }
 
 
-
-void on_trackbar( int, void* )
-{
-
-  // ROTATION
-
-  // get rotation matrix for rotating the image around its center
-  cv::Point2f center(original_img.cols / 2.0,
-                     original_img.rows / 2.0);
-  
-  cv::Mat rot = cv::getRotationMatrix2D(center, angle, 1.0);
-
-  cv::warpAffine(original_img,
-                 transformed_img,
-                 rot,
-                 original_img.size());
-
-  
-  // SCALE
-
-  Size size(100 + scale, 100 + scale);
-
-  cout << "Size " << size;
-  cout << "scale" << scale;
-  
-  resize(transformed_img, transformed_img, size);
-
-
-  // SHOW
-  imshow(transformed_img_win, transformed_img);
-}
-
-
-
 /**
  * @function on_trackbar
  * @brief Callback for trackbar
  */
-void on_trackbar2( int, void* )
+void on_trackbar( int, void* )
 {
 
   alpha_d = (double) alpha_g;
@@ -151,6 +123,8 @@ void on_trackbar2( int, void* )
   // SHOW
   imshow(transformed_img_win, transformed_img);
 }
+
+
 
 
 vector<double> generate_random(string filename) {
@@ -208,8 +182,7 @@ vector<double> generate_random(string filename) {
 }
 
 
-int main(int argc, char* argv[] ){
-  
+int random_main(int samples){
   
   // Path of map  
   std::string original_img_path = "img/dice.jpg";
@@ -234,8 +207,11 @@ int main(int argc, char* argv[] ){
                "Pitch", "Roll", "Yaw",
                "x", "y", "z");
 
+
+  boost::filesystem::remove_all("genimgs");
+  boost::filesystem::create_directory("genimgs");
   
-  for (int i = 0; i < 1000; i++) {
+  for (int i = 0; i < samples; i++) {
 
     string file_dir = "genimgs/";
     string file_base = "";
@@ -255,8 +231,8 @@ int main(int argc, char* argv[] ){
   
 }
 
-int main2(int argc, char* argv[] ){
 
+int gui_main(){
 
   // Path of map  
   std::string original_img_path = "img/dice.jpg";
@@ -269,7 +245,7 @@ int main2(int argc, char* argv[] ){
   tracking_img = cv::imread(tracking_img_path, CV_LOAD_IMAGE_COLOR);
 
 
-    // Check for invalid input
+  // Check for invalid input
   if (!original_img.data) {
       std::cout << "Could not open or find the image" << std::endl;
         return -1;
@@ -279,7 +255,7 @@ int main2(int argc, char* argv[] ){
    /// Initialize values
 
   alpha_g = 90; beta_g = 90; gamma_g = 90;
-  dx_g = original_img.rows; dy_g = original_img.cols; dz_g = 300;
+  dx_g = original_img.rows; dy_g = original_img.cols; dz_g = 200;
   f_g = 200;
 
   brightness = 0;
@@ -292,73 +268,93 @@ int main2(int argc, char* argv[] ){
   createTrackbar("Brightness",
                  trackbars_win,
                  &brightness,
-                 alpha_slider_max,
-                 on_trackbar2);
+                 brightness_slider_max,
+                 on_trackbar);
 
 
   createTrackbar("Blur",
                  trackbars_win,
                  &kernel_size,
                  20,
-                 on_trackbar2);
+                 on_trackbar);
 
 
   createTrackbar("Rotation Pitch",
                  trackbars_win,
                  &alpha_g,
                  180,
-                 on_trackbar2);
+                 on_trackbar);
 
 
   createTrackbar("Rotation Roll",
                  trackbars_win,
                  &beta_g,
                  180,
-                 on_trackbar2);
+                 on_trackbar);
 
 
   createTrackbar("Rotation Yaw",
                  trackbars_win,
                  &gamma_g,
                  180,
-                 on_trackbar2);
+                 on_trackbar);
   
 
-  createTrackbar("Dx_g",
+  createTrackbar("X",
                  trackbars_win,
                  &dx_g,
                  scale_slider_max,
-                 on_trackbar2);
+                 on_trackbar);
 
 
-  createTrackbar("Dy_g",
+  createTrackbar("Y",
                  trackbars_win,
                  &dy_g,
                  scale_slider_max,
-                 on_trackbar2);
+                 on_trackbar);
 
 
   createTrackbar("Height",
                  trackbars_win,
                  &dz_g,
                  1000,
-                 on_trackbar2);
+                 on_trackbar);
 
 
-  createTrackbar("f_g",
+  createTrackbar("Focal length",
                  trackbars_win,
                  &f_g,
                  1000,
-                 on_trackbar2);
+                 on_trackbar);
 
   
-  
-  // Show some stuff
-  //on_trackbar( alpha_slider, 0 );
-
   cv::imshow(transformed_img_win, original_img);
   cv::imshow(trackbars_win, tracking_img);
 
   cv::waitKey(0);
+
+  return 0;
   
 }
+
+static void help() {
+
+  cout << "*****\ndraug: Drone data augmentation based on one map image\n*****\n" << endl;
+  cout << "Usage:" << endl;
+  cout << "- Interactive data visualizer:\ndraug gui" << endl;
+  cout << "- Random view generation:\ndraug rnd [int]\nint specifies the number of samples (for example: draug rnd 1000). The corresponding coordinates are saved in targets.csv" << endl;
+}
+
+int main(int argc, char* argv[] ){
+
+  if (argc < 2){
+    help();
+  } else if (argv[1] == string("gui")) {
+    return gui_main();
+  } else if (argv[1] == string("rnd")) {
+    return random_main(atoi(argv[2]));
+  } else {
+    help();
+  }
+}
+  
