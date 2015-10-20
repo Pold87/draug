@@ -109,8 +109,8 @@ void on_trackbar( int, void* )
   beta_d = - (double) beta_g;
   gamma_d = (double) gamma_g;
 
-  dx_d = (double) - dx_g + original_img.rows;
-  dy_d = (double) - dy_g + original_img.cols;
+  dx_d = (double) - dx_g + (original_img.rows / 2);
+  dy_d = (double) - dy_g + (original_img.cols / 2);
   dz_d = (double) dz_g;
 
   f_d = (double) f_g;
@@ -132,11 +132,12 @@ vector<double> generate_random(string filename) {
   std::random_device rd;
   std::mt19937 gen(rd());
   
-  std::uniform_real_distribution<double> translation(0, original_img.rows);
+  std::normal_distribution<double> translation_x(original_img.rows / 2, original_img.rows / 8);
+  std::normal_distribution<double> translation_y(original_img.cols / 2, original_img.cols / 8);
 
-  std::uniform_real_distribution<double> yaw_rotation(0.0, 180.0);
-  std::normal_distribution<double> rotation(90, 45);
-  std::normal_distribution<double> height_dist(150, 90);
+  std::uniform_real_distribution<double> yaw_rotation(0.0, 360.0);
+  std::normal_distribution<double> rotation(90, 15);
+  std::normal_distribution<double> height_dist(150, 50);
 
   double alpha_g = rotation(gen);
   double beta_g = rotation(gen);
@@ -144,21 +145,21 @@ vector<double> generate_random(string filename) {
 
   //cout << alpha_g << beta_g << gamma_g;
   
-  double dx_g = translation(gen);
-  double dy_g = translation(gen);
+  double dx_g = translation_x(gen);
+  double dy_g = translation_y(gen);
   double dz_g = height_dist(gen);
 
   //cout << dx_g << dy_g << dz_g;
   
   
-  double f_g = 300;
+  double f_g = 200;
   
   alpha_d = (double) alpha_g;
   beta_d = - (double) beta_g;
   gamma_d = (double) gamma_g;
 
-  dx_d = (double) - dx_g + original_img.rows;
-  dy_d = (double) - dy_g + original_img.cols;
+  dx_d = (double) - dx_g + (original_img.rows / 2);
+  dy_d = (double) - dy_g + (original_img.cols / 2);
   dz_d = (double) dz_g;
 
   f_d = (double) f_g;
@@ -171,12 +172,12 @@ vector<double> generate_random(string filename) {
   cv:imwrite(filename, transformed_img);
 
   vector<double> targets(6);
-  targets[0] = alpha_d;
-  targets[1] = beta_d;
-  targets[2] = gamma_d;
-  targets[3] = dx_d;
-  targets[4] = dy_d;
-  targets[5] = dz_d;
+  targets[0] = alpha_g;
+  targets[1] = beta_g;
+  targets[2] = gamma_g;
+  targets[3] = dx_g;
+  targets[4] = dy_g;
+  targets[5] = dz_g;
 
   return targets;
 }
@@ -255,7 +256,7 @@ int gui_main(){
    /// Initialize values
 
   alpha_g = 90; beta_g = 90; gamma_g = 90;
-  dx_g = original_img.rows; dy_g = original_img.cols; dz_g = 200;
+  dx_g = original_img.rows / 2; dy_g = original_img.cols / 2; dz_g = 200;
   f_g = 200;
 
   brightness = 0;
