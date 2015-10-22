@@ -158,8 +158,8 @@ vector<double> generate_random(string filename) {
   std::random_device rd;
   std::mt19937 gen(rd());
   
-  std::normal_distribution<double> translation_x(original_img.rows / 2, original_img.rows / 8);
-  std::normal_distribution<double> translation_y(original_img.cols / 2, original_img.cols / 8);
+  std::normal_distribution<double> translation_x(0, original_img.rows / 8);
+  std::normal_distribution<double> translation_y(0, original_img.cols / 8);
 
   std::uniform_real_distribution<double> yaw_rotation(0.0, 360.0);
   std::normal_distribution<double> rotation(90, 15);
@@ -198,12 +198,12 @@ vector<double> generate_random(string filename) {
   cv:imwrite(filename, transformed_img);
 
   vector<double> targets(6);
-  targets[0] = alpha_g;
-  targets[1] = beta_g;
-  targets[2] = gamma_g;
-  targets[3] = dx_g;
-  targets[4] = dy_g;
-  targets[5] = dz_g;
+  targets[0] = alpha_d;
+  targets[1] = beta_d;
+  targets[2] = gamma_d;
+  targets[3] = dx_d;
+  targets[4] = dy_d;
+  targets[5] = dz_d;
 
   return targets;
 }
@@ -219,6 +219,9 @@ int main(int argc, char* argv[] ){
   
   original_img = cv::imread(original_img_path, CV_LOAD_IMAGE_COLOR);
   transformed_img = cv::imread(original_img_path, CV_LOAD_IMAGE_COLOR);
+
+  resize(original_img, original_img, Size(224, 224));
+  resize(transformed_img, transformed_img, Size(224, 224));
   
   tracking_img = cv::imread(tracking_img_path, CV_LOAD_IMAGE_COLOR);
   
@@ -266,6 +269,11 @@ int main2(int argc, char* argv[] ){
 
   original_img = cv::imread(original_img_path, CV_LOAD_IMAGE_COLOR);
   transformed_img = cv::imread(original_img_path, CV_LOAD_IMAGE_COLOR);
+
+
+  resize(original_img, original_img, Size(224, 224));
+  resize(transformed_img, transformed_img, Size(224, 224));
+
 
   tracking_img = cv::imread(tracking_img_path, CV_LOAD_IMAGE_COLOR);
 
