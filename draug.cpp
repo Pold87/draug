@@ -183,11 +183,10 @@ vector<double> generate_random(string filename) {
 }
 
 
-int random_main(int samples){
+int random_main(int samples, string original_img_path){
   
   // Path of map  
-  std::string original_img_path = "img/dice.jpg";
-  //std::string original_img_path = "img/maze_sep_s.jpg";
+
   std::string tracking_img_path = "img/tracking.png";
   
   original_img = cv::imread(original_img_path, CV_LOAD_IMAGE_COLOR);
@@ -233,10 +232,10 @@ int random_main(int samples){
 }
 
 
-int gui_main(){
+int gui_main(string original_img_path){
 
   // Path of map  
-  std::string original_img_path = "img/dice.jpg";
+  //std::string original_img_path = "img/dice.jpg";
   //std::string original_img_path = "img/maze_sep_s.jpg";
   std::string tracking_img_path = "img/tracking.png";
 
@@ -342,8 +341,8 @@ static void help() {
 
   cout << "*****\ndraug: Drone data augmentation based on one map image\n*****\n" << endl;
   cout << "Usage:" << endl;
-  cout << "- Interactive data visualizer:\ndraug gui" << endl;
-  cout << "- Random view generation:\ndraug rnd [int]\nint specifies the number of samples (for example: draug rnd 1000). The corresponding coordinates are saved in targets.csv" << endl;
+  cout << "- Interactive data visualizer:\ndraug gui [image]\nimage is the location of an image, for example picture1.png" << endl;
+  cout << "- Random view generation:\ndraug rnd [int] [image]\nint specifies the number of samples (for example: draug rnd 1000 picture1.png). The corresponding coordinates are saved in targets.csv" << endl;
 }
 
 int main(int argc, char* argv[] ){
@@ -351,9 +350,9 @@ int main(int argc, char* argv[] ){
   if (argc < 2){
     help();
   } else if (argv[1] == string("gui")) {
-    return gui_main();
+    return gui_main(argv[2]);
   } else if (argv[1] == string("rnd")) {
-    return random_main(atoi(argv[2]));
+    return random_main(atoi(argv[2]), argv[3]);
   } else {
     help();
   }
