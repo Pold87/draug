@@ -1,3 +1,6 @@
 *~
 genimgs/
 *#
+*.png
+*.csv
+*.jpg

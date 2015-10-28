@@ -83,13 +83,37 @@ void rotateImage(const Mat &input, Mat &output, double alpha, double beta, doubl
              0, 1, 0, dy,
              0, 0, 1, dz,
              0, 0, 0, 1);
+
+    Mat tvec(4,1,cv::DataType<double>::type);
+
+    tvec.at<double>(0) = dx;
+    tvec.at<double>(1) = dy;
+    tvec.at<double>(2) = dz;
+    tvec.at<double>(3) = 1;
+
+    //    cout << tvec.at<double>(0) << endl;
+    //    cout << tvec.at<double>(1) << endl;
+    //    cout << tvec.at<double>(2) << endl;
+
+    R = R.t();  // rotation of inverse
+    tvec = -R * tvec; // translation of inverse
+
+    //    cout << tvec.at<double>(0) << endl;
+    
+    Mat T_new = (Mat_<double>(4, 4) <<
+                 1, 0, 0, tvec.at<double>(0),
+                 0, 1, 0, tvec.at<double>(1),
+                 0, 0, 1, tvec.at<double>(2),
+                 0, 0, 0, 1);
+
     // 3D -> 2D matrix
     Mat A2 = (Mat_<double>(3,4) <<
               f, 0, w/2, 0,
               0, f, h/2, 0,
               0, 0,   1, 0);
     // Final transformation matrix
-    Mat trans = A2 * (T * (R * A1));
+    Mat trans = A2 * (T_new * (R * A1));
+
     // Apply matrix transformation
     warpPerspective(input, output, trans, input.size());
 
@@ -132,12 +156,13 @@ vector<double> generate_random(string filename) {
   std::random_device rd;
   std::mt19937 gen(rd());
   
-  std::normal_distribution<double> translation_x(0, original_img.rows / 8);
-  std::normal_distribution<double> translation_y(0, original_img.cols / 8);
+  //  std::normal_distribution<double> translation_x(original_img.rows / 2, original_img.rows / 8);
+  std::uniform_real_distribution<double> translation_x(0, 300.);
+  std::normal_distribution<double> translation_y(original_img.rows / 2, original_img.cols / 8);
 
   std::uniform_real_distribution<double> yaw_rotation(0.0, 360.0);
-  std::normal_distribution<double> rotation(90, 15);
-  std::normal_distribution<double> height_dist(150, 50);
+  std::normal_distribution<double> rotation(90, 7);
+  std::normal_distribution<double> height_dist(250, 50);
 
   double alpha_g = rotation(gen);
   double beta_g = rotation(gen);
@@ -175,7 +200,7 @@ vector<double> generate_random(string filename) {
   targets[0] = alpha_d;
   targets[1] = beta_d;
   targets[2] = gamma_d;
-  targets[3] = dx_d;
+  targets[3] = dx_g;
   targets[4] = dy_d;
   targets[5] = dz_d;
 
@@ -183,11 +208,10 @@ vector<double> generate_random(string filename) {
 }
 
 
-int random_main(int samples){
+int random_main(int samples, string original_img_path){
   
   // Path of map  
-  std::string original_img_path = "img/dice.jpg";
-  //std::string original_img_path = "img/maze_sep_s.jpg";
+
   std::string tracking_img_path = "img/tracking.png";
   
   original_img = cv::imread(original_img_path, CV_LOAD_IMAGE_COLOR);
@@ -236,10 +260,10 @@ int random_main(int samples){
 }
 
 
-int gui_main(){
+int gui_main(string original_img_path){
 
   // Path of map  
-  std::string original_img_path = "img/dice.jpg";
+  //std::string original_img_path = "img/dice.jpg";
   //std::string original_img_path = "img/maze_sep_s.jpg";
   std::string tracking_img_path = "img/tracking.png";
 
@@ -350,8 +374,8 @@ static void help() {
 
   cout << "*****\ndraug: Drone data augmentation based on one map image\n*****\n" << endl;
   cout << "Usage:" << endl;
-  cout << "- Interactive data visualizer:\ndraug gui" << endl;
-  cout << "- Random view generation:\ndraug rnd [int]\nint specifies the number of samples (for example: draug rnd 1000). The corresponding coordinates are saved in targets.csv" << endl;
+  cout << "- Interactive data visualizer:\ndraug gui [image]\nimage is the location of an image, for example picture1.png" << endl;
+  cout << "- Random view generation:\ndraug rnd [int] [image]\nint specifies the number of samples (for example: draug rnd 1000 picture1.png). The corresponding coordinates are saved in targets.csv" << endl;
 }
 
 int main(int argc, char* argv[] ){
@@ -359,9 +383,9 @@ int main(int argc, char* argv[] ){
   if (argc < 2){
     help();
   } else if (argv[1] == string("gui")) {
-    return gui_main();
+    return gui_main(argv[2]);
   } else if (argv[1] == string("rnd")) {
-    return random_main(atoi(argv[2]));
+    return random_main(atoi(argv[2]), argv[3]);
   } else {
     help();
   }
