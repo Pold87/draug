@@ -29,7 +29,7 @@ std::string trackbars_win = "Trackbars";
 
 const int scale_slider_max = 1000;
 const int brightness_slider_max = 1000;
-int angle, brightness, scale;
+int angle, brightness, scale, contrast;
 int alpha_g, beta_g, gamma_g;
 int dx_g, dy_g, dz_g;
 int f_g;
@@ -129,21 +129,26 @@ void rotateImage(const Mat &input, Mat &output, double alpha, double beta, doubl
 void on_trackbar( int, void* )
 {
 
-  alpha_d = (double) alpha_g;
+  alpha_d = - (double) alpha_g;
   beta_d = - (double) beta_g;
   gamma_d = (double) gamma_g;
 
-  dx_d = (double) - dx_g + (original_img.rows / 2);
+  dx_d = (double) dx_g - (original_img.rows / 2);
   dy_d = (double) - dy_g + (original_img.cols / 2);
   dz_d = (double) dz_g;
 
   f_d = (double) f_g;
 
+  // Perform perspective transformations
   rotateImage(original_img, transformed_img,
               alpha_d, beta_d, gamma_d,
               dx_d, dy_d, dz_d,
               f_d);
 
+  // Change brightness and contrast
+  transformed_img.convertTo(transformed_img, -1, contrast, brightness);
+
+  
   // SHOW
   imshow(transformed_img_win, transformed_img);
 }
@@ -180,7 +185,7 @@ vector<double> generate_random(string filename) {
   double f_g = 200;
   
   alpha_d = (double) alpha_g;
-  beta_d = - (double) beta_g;
+  beta_d = -(double) beta_g;
   gamma_d = (double) gamma_g;
 
   dx_d = (double) - dx_g + (original_img.rows / 2);
@@ -290,7 +295,8 @@ int gui_main(string original_img_path){
   alpha_g = 90; beta_g = 90; gamma_g = 90;
   dx_g = original_img.rows / 2; dy_g = original_img.cols / 2; dz_g = 200;
   f_g = 200;
-
+  
+  contrast = 1;
   brightness = 0;
   kernel_size = 0;
   
