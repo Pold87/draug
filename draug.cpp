@@ -133,7 +133,9 @@ void on_trackbar( int, void* )
   beta_d = - (double) beta_g;
   gamma_d = (double) gamma_g;
 
-  dx_d = (double) dx_g - (original_img.rows / 2);
+
+
+  dx_d = (double) - dx_g + (original_img.rows / 2);
   dy_d = (double) - dy_g + (original_img.cols / 2);
   dz_d = (double) dz_g;
 
@@ -162,12 +164,12 @@ vector<double> generate_random(string filename) {
   std::mt19937 gen(rd());
   
   //  std::normal_distribution<double> translation_x(original_img.rows / 2, original_img.rows / 8);
-  std::uniform_real_distribution<double> translation_x(0, 300.);
-  std::normal_distribution<double> translation_y(original_img.rows / 2, original_img.cols / 8);
+  std::uniform_real_distribution<double> translation_x(original_img.rows / 10, original_img.rows - original_img.rows / 10);
+  std::uniform_real_distribution<double> translation_y(original_img.rows / 10, original_img.rows - original_img.rows / 10);
 
   std::uniform_real_distribution<double> yaw_rotation(0.0, 360.0);
-  std::normal_distribution<double> rotation(90, 7);
-  std::normal_distribution<double> height_dist(250, 50);
+  std::normal_distribution<double> rotation(90, 4);
+  std::uniform_real_distribution<double> height_dist(200.0, 600.0);
 
   double alpha_g = rotation(gen);
   double beta_g = rotation(gen);
@@ -179,10 +181,10 @@ vector<double> generate_random(string filename) {
   double dy_g = translation_y(gen);
   double dz_g = height_dist(gen);
 
-  //cout << dx_g << dy_g << dz_g;
+  cout << "dx_g" << dx_g << "dy_g" << dy_g << "dz_g" << dz_g;
   
   
-  double f_g = 200;
+  double f_g = 1000;
   
   alpha_d = (double) alpha_g;
   beta_d = -(double) beta_g;
@@ -199,7 +201,10 @@ vector<double> generate_random(string filename) {
               dx_d, dy_d, dz_d,
               f_d);
 
-  cv:imwrite(filename, transformed_img);
+
+resize(transformed_img, transformed_img, Size(224, 224));
+  
+cv:imwrite(filename, transformed_img);
 
   vector<double> targets(6);
   targets[0] = alpha_d;
@@ -222,8 +227,8 @@ int random_main(int samples, string original_img_path){
   original_img = cv::imread(original_img_path, CV_LOAD_IMAGE_COLOR);
   transformed_img = cv::imread(original_img_path, CV_LOAD_IMAGE_COLOR);
 
-  resize(original_img, original_img, Size(224, 224));
-  resize(transformed_img, transformed_img, Size(224, 224));
+  //resize(original_img, original_img, Size(224, 224));
+  //resize(transformed_img, transformed_img, Size(224, 224));
   
   tracking_img = cv::imread(tracking_img_path, CV_LOAD_IMAGE_COLOR);
   
@@ -276,8 +281,8 @@ int gui_main(string original_img_path){
   transformed_img = cv::imread(original_img_path, CV_LOAD_IMAGE_COLOR);
 
 
-  resize(original_img, original_img, Size(224, 224));
-  resize(transformed_img, transformed_img, Size(224, 224));
+    resize(original_img, original_img, Size(1224, 1224));
+    resize(transformed_img, transformed_img, Size(1224, 1224));
 
 
   tracking_img = cv::imread(tracking_img_path, CV_LOAD_IMAGE_COLOR);
