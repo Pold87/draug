@@ -23,8 +23,22 @@ for example, `draug rnd 1000 map.png` for generating 1000 random
 samples (random x, y, z, roll, pitch, and yaw) of the views
 
 ## Example: 
+
+The original image (in the example map.png):
+
 ![Original image (map)](https://raw.githubusercontent.com/Pold87/draug/master/img/cyberzoo_small.png "Cyberzoo")
 
-![Generated images (showing 0.png - 15.png in one image)](https://raw.githubusercontent.com/Pold87/draug/master/montage.png "Generated images")
+The generated images (showing 0.png - 15.png in one image):
+
+![Generated images](https://raw.githubusercontent.com/Pold87/draug/master/montage.png "Generated images")
+
+The targets file:
+
+Pitch | Roll | Yaw | x | y | z |
+| ----|------|-----|---|---|-- |
+94.483653|-88.704241|343.623298|3066.280596|1203.075478|239.348295|
+90.193006|-92.050808|98.881635|2689.806722|-1477.947856|413.675838|
+...|...|...|...|...|...|
+
 
 
