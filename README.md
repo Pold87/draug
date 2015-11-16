@@ -25,6 +25,6 @@ samples (random x, y, z, roll, pitch, and yaw) of the views
 ## Example: 
 ![Original image (map)](https://raw.githubusercontent.com/Pold87/draug/master/img/cyberzoo_small.png "Cyberzoo")
 
-![Generated images (showing 0.png - 15.png in one image)](https://raw.githubusercontent.com/Pold87/draug/master/img/montage.png "Generated images")
+![Generated images (showing 0.png - 15.png in one image)](https://raw.githubusercontent.com/Pold87/draug/master/montage.png "Generated images")
 
 
