@@ -22,4 +22,9 @@ You need OpenCV and Boost for compiling.
 for example, `draug rnd 1000 map.png` for generating 1000 random
 samples (random x, y, z, roll, pitch, and yaw) of the views
 
+## Example: 
+![Original image (map)](https://raw.githubusercontent.com/Pold87/draug/master/img/cyberzoo_small.png "Cyberzoo")
+
+![Generated images (showing 0.png - 15.png in one image)](https://raw.githubusercontent.com/Pold87/draug/master/img/montage.png "Generated images")
+
 
