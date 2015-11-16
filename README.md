@@ -24,15 +24,15 @@ samples (random x, y, z, roll, pitch, and yaw) of the views
 
 ## Example: 
 
-### The original image
+### Original image
 
 ![Original image (map)](https://raw.githubusercontent.com/Pold87/draug/master/img/cyberzoo_small.png "Cyberzoo")
 
-### The generated images
+### Generated images
 
 ![Generated images](https://raw.githubusercontent.com/Pold87/draug/master/montage.png "Generated images")
 
-The targets file:
+### Targets file
 
 |Pitch | Roll | Yaw | x | y | z |
 |----|------|-----|---|---|---|
