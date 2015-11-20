@@ -164,16 +164,15 @@ vector<double> generate_random(string filename) {
   std::random_device rd;
   std::mt19937 gen(rd());
   
-  //  std::normal_distribution<double> translation_x(original_img.rows / 2, original_img.rows / 8);
-  std::uniform_real_distribution<double> translation_x(original_img.rows / 10, original_img.rows - original_img.rows / 10);
-  std::uniform_real_distribution<double> translation_y(original_img.rows / 10, original_img.rows - original_img.rows / 10);
+  std::uniform_real_distribution<double> translation_x(0, original_img.cols);
+  std::uniform_real_distribution<double> translation_y(0, original_img.rows);
 
   std::uniform_real_distribution<double> yaw_rotation(0.0, 360.0);
   std::normal_distribution<double> rotation(90, 4);
-  std::uniform_real_distribution<double> height_dist(200.0, 500.0);
-  std::uniform_real_distribution<double> blur_dist(0.0, 10.0);
-  std::normal_distribution<double> brightness_dist(0.0, 10.0);
-  std::uniform_real_distribution<double> contrast_dist(1.0, 1.5);
+  std::uniform_real_distribution<double> height_dist(30.0, 350.0);
+  std::uniform_real_distribution<double> blur_dist(0.0, 30.0);
+  std::normal_distribution<double> brightness_dist(0.0, 40.0);
+  std::uniform_real_distribution<double> contrast_dist(1.0, 1.7);
 
   double alpha_g = rotation(gen);
   double beta_g = rotation(gen);
@@ -185,7 +184,7 @@ vector<double> generate_random(string filename) {
   double dy_g = translation_y(gen);
   double dz_g = height_dist(gen);
 
-  double f_g = 1000;
+  double f_g = 290;
   
   alpha_d = (double) alpha_g;
   beta_d =  (double) beta_g;
@@ -209,11 +208,13 @@ vector<double> generate_random(string filename) {
 
 
   // Change brightness and contrast
-  transformed_img.convertTo(transformed_img, -1, contrast, brightness);
+  //  transformed_img.convertTo(transformed_img, -1, contrast, brightness);
 
   cv::blur(transformed_img, transformed_img, Size(kernel_size + 1, kernel_size + 1), Point(-1,-1));
+
+  resize(transformed_img, transformed_img, Size(640, 480));
   
- cv:imwrite(filename, transformed_img);
+  cv:imwrite(filename, transformed_img);
 
   vector<double> targets(6);
   targets[0] = alpha_d;
