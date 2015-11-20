@@ -27,8 +27,8 @@ cv::Mat original_img, transformed_img, tracking_img;
 std::string transformed_img_win = "Transformed Image";
 std::string trackbars_win = "Trackbars";
 
-const int scale_slider_max = 1000;
-const int brightness_slider_max = 1000;
+const int scale_slider_max = 2000;
+const int brightness_slider_max = 2000;
 int angle, brightness, scale, contrast;
 int alpha_g, beta_g, gamma_g;
 int dx_g, dy_g, dz_g;
@@ -129,15 +129,16 @@ void rotateImage(const Mat &input, Mat &output, double alpha, double beta, doubl
 void on_trackbar( int, void* )
 {
 
-  alpha_d = - (double) alpha_g;
-  beta_d = - (double) beta_g;
+  alpha_d = (double) alpha_g;
+  beta_d  = (double) beta_g;
   gamma_d = (double) gamma_g;
 
 
+  cout << " cols " << original_img.cols << " rows " << original_img.rows << "\n";
 
-  dx_d = (double) - dx_g + (original_img.rows / 2);
-  dy_d = (double) - dy_g + (original_img.cols / 2);
-  dz_d = (double) dz_g;
+  dx_d = (double) dx_g - (original_img.cols / 2);
+  dy_d = (double) - dy_g + (original_img.rows / 2);
+  dz_d = (double) - dz_g;
 
   f_d = (double) f_g;
 
@@ -170,6 +171,9 @@ vector<double> generate_random(string filename) {
   std::uniform_real_distribution<double> yaw_rotation(0.0, 360.0);
   std::normal_distribution<double> rotation(90, 4);
   std::uniform_real_distribution<double> height_dist(200.0, 500.0);
+  std::uniform_real_distribution<double> blur_dist(0.0, 10.0);
+  std::normal_distribution<double> brightness_dist(0.0, 10.0);
+  std::uniform_real_distribution<double> contrast_dist(1.0, 1.5);
 
   double alpha_g = rotation(gen);
   double beta_g = rotation(gen);
@@ -181,18 +185,15 @@ vector<double> generate_random(string filename) {
   double dy_g = translation_y(gen);
   double dz_g = height_dist(gen);
 
-  cout << "dx_g" << dx_g << "dy_g" << dy_g << "dz_g" << dz_g;
-  
-  
   double f_g = 1000;
   
   alpha_d = (double) alpha_g;
-  beta_d = -(double) beta_g;
+  beta_d =  (double) beta_g;
   gamma_d = (double) gamma_g;
 
-  dx_d = (double) - dx_g + (original_img.rows / 2);
+  dx_d = (double) dx_g - (original_img.rows / 2);
   dy_d = (double) - dy_g + (original_img.cols / 2);
-  dz_d = (double) dz_g;
+  dz_d = (double) - dz_g;
 
   f_d = (double) f_g;
 
@@ -202,16 +203,24 @@ vector<double> generate_random(string filename) {
               f_d);
 
 
-resize(transformed_img, transformed_img, Size(224, 224));
+  contrast = contrast_dist(gen);
+  brightness = brightness_dist(gen);
+  kernel_size = blur_dist(gen);
+
+
+  // Change brightness and contrast
+  transformed_img.convertTo(transformed_img, -1, contrast, brightness);
+
+  cv::blur(transformed_img, transformed_img, Size(kernel_size + 1, kernel_size + 1), Point(-1,-1));
   
-cv:imwrite(filename, transformed_img);
+ cv:imwrite(filename, transformed_img);
 
   vector<double> targets(6);
   targets[0] = alpha_d;
   targets[1] = beta_d;
   targets[2] = gamma_d;
   targets[3] = dx_g;
-  targets[4] = dy_d;
+  targets[4] = dy_g;
   targets[5] = dz_d;
 
   return targets;
