@@ -25,8 +25,6 @@ using namespace boost::filesystem;
 
 int main(int argc, char* argv[]) {
 
-  FILE* targets_file = fopen("targets.csv", "w+");
-
   int samples = atoi(argv[1]);
   string original_img_path = argv[2];
   path p(original_img_path);
