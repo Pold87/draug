@@ -167,12 +167,16 @@ vector<double> generate_random(string filename) {
   std::uniform_real_distribution<double> yaw_rotation(0.0, 360.0);
   std::normal_distribution<double> rotation(90, 2);
   std::uniform_real_distribution<double> height_dist(500, 1100);
-  std::uniform_real_distribution<double> blur_dist(0.0, 8.0);
+  std::uniform_real_distribution<double> blur_dist(0.0, 2.0);
   std::normal_distribution<double> brightness_dist(0.0, 10.0);
   std::uniform_real_distribution<double> contrast_dist(1.0, 1.7);
 
-  double alpha_g = rotation(gen);
-  double beta_g = rotation(gen);
+  //  double alpha_g = rotation(gen);
+  // double beta_g = rotation(gen);
+
+  double alpha_g = 90;
+  double beta_g = 90;
+
   double gamma_g = yaw_rotation(gen);
 
   //cout << alpha_g << beta_g << gamma_g;
