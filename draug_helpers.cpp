@@ -244,7 +244,7 @@ vector<double> generate_random_multiple(string original_img_path,  string filena
 }
 
 
-int random_main(int samples, string original_img_path){
+int random_main(int samples, string original_img_path, string out_folder){
   
   // Path of map  
 
@@ -272,12 +272,12 @@ int random_main(int samples, string original_img_path){
                "x", "y", "z");
 
 
-  boost::filesystem::remove_all("genimgs");
-  boost::filesystem::create_directory("genimgs");
+  //boost::filesystem::remove_all("genimgs");
+  boost::filesystem::create_directory(out_folder);
   
   for (int i = 0; i < samples; i++) {
 
-    string file_dir = "genimgs/";
+    string file_dir = "out_folder" + "/";
     string file_base = "";
     string ext = ".png";
 

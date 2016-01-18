@@ -36,7 +36,7 @@ int main(int argc, char* argv[] ){
   } else if (argv[1] == string("gui")) {
     return gui_main(argv[2]);
   } else if (argv[1] == string("rnd")) {
-    return random_main(atoi(argv[2]), argv[3]);
+    return random_main(atoi(argv[2]), argv[3], argv[4]);
   } else {
     help();
   }
