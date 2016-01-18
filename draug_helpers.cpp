@@ -277,7 +277,7 @@ int random_main(int samples, string original_img_path, string out_folder){
   
   for (int i = 0; i < samples; i++) {
 
-    string file_dir = "out_folder" + "/";
+    string file_dir = out_folder + '/';
     string file_base = "";
     string ext = ".png";
 

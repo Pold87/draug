@@ -23,7 +23,7 @@ void rotateImage(const cv::Mat &input, cv::Mat &output, double alpha, double bet
 void on_trackbar( int, void* );
 std::vector<double> generate_random(std::string filename);
 std::vector<double> generate_random_multiple(std::string original_img_path,  std::string filename);
-int random_main(int samples, std::string original_img_path);
+int random_main(int samples, std::string original_img_path, std::string out_folder);
 int gui_main(std::string original_img_path);
 
 #endif
