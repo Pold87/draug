@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <boost/filesystem.hpp>
+#include <boost/format.hpp>
 
 // Include OpenCV libraries
 
@@ -99,7 +100,7 @@ void rotateImage(const Mat &input, Mat &output, double alpha, double beta, doubl
     tvec = -R * tvec; // translation of inverse
 
     //    cout << tvec.at<double>(0) << endl;
-    
+
     Mat T_new = (Mat_<double>(4, 4) <<
                  1, 0, 0, tvec.at<double>(0),
                  0, 1, 0, tvec.at<double>(1),
@@ -135,7 +136,7 @@ void on_trackbar( int, void* )
 
 
   cout << " cols " << original_img.cols << " rows " << original_img.rows << "\n";
-
+  
   dx_d = (double) dx_g - (original_img.cols / 2);
   dy_d = (double) - dy_g + (original_img.rows / 2);
   dz_d = (double) - dz_g;
@@ -161,41 +162,45 @@ vector<double> generate_random(string filename) {
   std::random_device rd;
   std::mt19937 gen(rd());
   
-  std::uniform_real_distribution<double> translation_x(0, original_img.cols);
-  std::uniform_real_distribution<double> translation_y(0, original_img.rows);
+  //  std::uniform_real_distribution<double> translation_x(0, original_img.cols);
+  //  std::uniform_real_distribution<double> translation_y(0, original_img.rows);
 
-  std::uniform_real_distribution<double> yaw_rotation(0.0, 360.0);
-  std::normal_distribution<double> rotation(90, 2);
-  std::uniform_real_distribution<double> height_dist(500, 1100);
+  //  std::uniform_real_distribution<double> translation_x(-20, original_img.cols - 120);
+  //  std::uniform_real_distribution<double> translation_y(100, original_img.rows);
+  // such that 99 % (3 STD) of the translations are within the picture
+  std::normal_distribution<double> translation_x(original_img.cols / 2, 107);
+  std::normal_distribution<double> translation_y(original_img.rows / 2, 80);
+  std::uniform_real_distribution<double> yaw_rotation(90.0, 90.0);
+  std::normal_distribution<double> rotation(90, 1);
+  std::uniform_real_distribution<double> height_dist(100, 100);
   std::uniform_real_distribution<double> blur_dist(0.0, 2.0);
-  std::normal_distribution<double> brightness_dist(0.0, 10.0);
-  std::uniform_real_distribution<double> contrast_dist(1.0, 1.7);
+  std::normal_distribution<double> brightness_dist(0.0, 2.0);
+  std::uniform_real_distribution<double> contrast_dist(1.0, 1.3);
 
-  //  double alpha_g = rotation(gen);
+  // double alpha_g = rotation(gen);
   // double beta_g = rotation(gen);
 
   double alpha_g = 90;
   double beta_g = 90;
-
   double gamma_g = yaw_rotation(gen);
+  //double gamma_g = 90;
 
   //cout << alpha_g << beta_g << gamma_g;
   
-  // double dx_g = translation_x(gen);
-  // double dy_g = translation_y(gen);
-  double dx_g = original_img.cols / 2;
-  double dy_g = original_img.rows / 2;
-
+  double dx_g = translation_x(gen);
+  double dy_g = translation_y(gen);
+  //double dx_g = original_img.cols / 2;
+  //double dy_g = original_img.rows / 2;
   double dz_g = height_dist(gen);
-
+  //double dz_g = 1000;
   double f_g = 1000;
   
   alpha_d = (double) alpha_g;
   beta_d =  (double) beta_g;
   gamma_d = (double) gamma_g;
 
-  dx_d = (double) dx_g - (original_img.rows / 2);
-  dy_d = (double) - dy_g + (original_img.cols / 2);
+  dx_d = (double) dx_g - (original_img.cols / 2);
+  dy_d = (double) - dy_g + (original_img.rows / 2);
   dz_d = (double) - dz_g;
 
   f_d = (double) f_g;
@@ -214,9 +219,9 @@ vector<double> generate_random(string filename) {
   // Change brightness and contrast
   //  transformed_img.convertTo(transformed_img, -1, contrast, brightness);
 
-  cv::blur(transformed_img, transformed_img, Size(kernel_size + 1, kernel_size + 1), Point(-1,-1));
+  //cv::blur(transformed_img, transformed_img, Size(kernel_size + 1, kernel_size + 1), Point(-1,-1));
 
-  resize(transformed_img, transformed_img, Size(640, 480));
+  //resize(transformed_img, transformed_img, Size(640, 480));
   
   cv:imwrite(filename, transformed_img);
 
@@ -225,8 +230,8 @@ vector<double> generate_random(string filename) {
   targets[1] = beta_d;
   targets[2] = gamma_d;
   targets[3] = dx_g;
-  targets[4] = dy_g;
-  targets[5] = dz_d;
+  targets[4] = original_img.rows - dy_g;
+  targets[5] = - dz_d;
 
   return targets;
 }
@@ -277,11 +282,11 @@ int random_main(int samples, string original_img_path, string out_folder){
   
   for (int i = 0; i < samples; i++) {
 
-    string file_dir = out_folder + '/';
-    string file_base = "";
     string ext = ".png";
 
-    string file_name = file_dir + file_base + to_string(i) + ext;
+    boost::format fmter("%s/img_%05d%s");
+
+    string file_name = str(fmter % out_folder % i % ext);
         
     vector<double> targets = generate_random(file_name);
 
@@ -307,8 +312,8 @@ int gui_main(string original_img_path){
   transformed_img = cv::imread(original_img_path, CV_LOAD_IMAGE_COLOR);
 
 
-    resize(original_img, original_img, Size(1224, 1224));
-    resize(transformed_img, transformed_img, Size(1224, 1224));
+  //resize(original_img, original_img, Size(1224, 1224));
+  //resize(transformed_img, transformed_img, Size(1224, 1224));
 
 
   tracking_img = cv::imread(tracking_img_path, CV_LOAD_IMAGE_COLOR);
@@ -325,7 +330,7 @@ int gui_main(string original_img_path){
 
   alpha_g = 90; beta_g = 90; gamma_g = 90;
   dx_g = original_img.rows / 2; dy_g = original_img.cols / 2; dz_g = 200;
-  f_g = 200;
+  f_g = 1000;
   
   contrast = 1;
   brightness = 0;
