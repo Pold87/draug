@@ -165,23 +165,23 @@ vector<double> generate_random(string filename) {
   //  std::uniform_real_distribution<double> translation_x(0, original_img.cols);
   //  std::uniform_real_distribution<double> translation_y(0, original_img.rows);
 
-  //  std::uniform_real_distribution<double> translation_x(-20, original_img.cols - 120);
-  //  std::uniform_real_distribution<double> translation_y(100, original_img.rows);
+  std::uniform_real_distribution<double> translation_x((210 / 2), original_img.cols - (210 / 2));
+  std::uniform_real_distribution<double> translation_y((210 / 2), original_img.rows - (210 / 2));
   // such that 99 % (3 STD) of the translations are within the picture
-  std::normal_distribution<double> translation_x(original_img.cols / 2, 107);
-  std::normal_distribution<double> translation_y(original_img.rows / 2, 80);
-  std::uniform_real_distribution<double> yaw_rotation(90.0, 90.0);
+  //std::normal_distribution<double> translation_x(original_img.cols / 2, 107);
+  //std::normal_distribution<double> translation_y(original_img.rows / 2, 80);
+  std::uniform_real_distribution<double> yaw_rotation(88.0, 92.0);
   std::normal_distribution<double> rotation(90, 1);
-  std::uniform_real_distribution<double> height_dist(100, 100);
+  std::uniform_real_distribution<double> height_dist(190, 210);
   std::uniform_real_distribution<double> blur_dist(0.0, 2.0);
   std::normal_distribution<double> brightness_dist(0.0, 2.0);
   std::uniform_real_distribution<double> contrast_dist(1.0, 1.3);
 
-  // double alpha_g = rotation(gen);
-  // double beta_g = rotation(gen);
+  double alpha_g = rotation(gen);
+  double beta_g = rotation(gen);
 
-  double alpha_g = 90;
-  double beta_g = 90;
+  //double alpha_g = 90;
+  //double beta_g = 90;
   double gamma_g = yaw_rotation(gen);
   //double gamma_g = 90;
 
@@ -221,8 +221,8 @@ vector<double> generate_random(string filename) {
 
   //cv::blur(transformed_img, transformed_img, Size(kernel_size + 1, kernel_size + 1), Point(-1,-1));
 
-  //resize(transformed_img, transformed_img, Size(640, 480));
-  
+  resize(transformed_img, transformed_img, Size(640, 480));
+
   cv:imwrite(filename, transformed_img);
 
   vector<double> targets(6);
